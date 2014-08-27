@@ -4,7 +4,7 @@ module.exports = function(server) {
 
   return { 
     findById: function(id, cb) {
-      db.users.find({id:id}, cb);
+      db.users.findOne({id:id}, cb);
     },
 
     findOrCreate: function(token, secret, profile, cb) {

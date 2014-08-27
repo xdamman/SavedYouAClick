@@ -4,6 +4,11 @@ var passport = require('passport')
 
 module.exports = function(server) {
 
+  server.get('/logout', function(req, res){
+    req.logout();
+    res.redirect(req.session.redirectUrl);
+  });
+
   // Redirect the user to Twitter for authentication.  When complete, Twitter
   // will redirect the user back to the application at
   //   /auth/twitter/callback
@@ -26,7 +31,6 @@ module.exports = function(server) {
         // otherwise, use the default.
         if (req.session.redirectUrl) {
           redirectUrl = req.session.redirectUrl;
-          req.session.redirectUrl = null;
         }
         req.logIn(user, function(err){
           if (err) { return next(err); }
@@ -43,7 +47,7 @@ module.exports = function(server) {
     }
 
     var params = {
-        text: req.param('text')
+        status: req.param('status')
       , in_reply_to_status_id: req.param('in_reply_to_status_id')
       , imgurl: req.param('imgurl')
       , token: req.user.token
@@ -59,30 +63,46 @@ module.exports = function(server) {
 
   });
 
+  server.get('/tweetsent', function(req, res) {
+    res.render('tweetsent');
+  });
+
   server.get('/', function(req, res) {
    
+    req.session.redirectUrl = req.url;
     if(!req.user) {
-      req.session.redirectUrl = req.url;
       res.render('signin');
     }
     else {
 
       var params = {
           url: req.param('url')
-        , from: req.param('from')
-        , text: req.param('text', '')
+        , via: req.param('via')
+        , status: req.param('status', '')
         , imgurl: req.param('imgurl')
       };
       console.log("Getting tweet for ", params.url);
-      twitterlib.getTweetFromUserWithUrl(params.from, params.url, function(e, tweet) {
+      twitterlib.getTweetFromUserWithUrl(params.via, params.url, function(e, tweet) {
         if(tweet) {
-          params.text += " RT @"+params.from+" "+tweet.text;
+          tweet.text = tweet.text.replace(/https?:\/\/[^ ]+/ig,'');
           params.in_reply_to_status_id = tweet.id;
         }
+        else {
+          tweet = {};
+          tweet.text = req.param('title','');
+        }
 
-        params.text += " #SavedYouAClick";
+        params.tweet = tweet;
 
-        console.log("params: ", params);
+        params.status += " RT @"+params.via+" "+tweet.text;
+        params.status = "#SavedYouAClick " + params.status;
+        params.status = params.status.replace(/ +/g,' ');
+
+        if(params.status.length < 119)
+          params.status += " " + params.url;
+
+        params.user = req.user.profile._json;
+
         res.render('tweet', params);
 
       });

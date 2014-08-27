@@ -1,33 +1,88 @@
-<form method="POST" action="/tweet">
+<style>
+  #counter {
+    margin-right: 10px;
+  }
 
-  <input type="hidden" name="in_reply_to_status_id" value="{{in_reply_to_status_id}}" />
-  <input type="hidden" name="imgurl" value="{{imgurl}}" />
+  #status {
+    margin: 15px 0px;
+  }
 
-  <textarea name="text" id="text" class="form-control" rows="3">{{text}}</textarea>
+  #tweetimg {
+    margin: 15px 0px;
+  }
 
-  <div id="chars_left"><span id="counter">0</span><label>chars left</label></div>
+</style>
 
-  <img src="{{imgurl}}" />
 
-  <input type="submit" class="btn btn-default" id="submit" value="Tweet" />
+<div class="panel panel-default">
+  <div class="panel-heading">
 
-</form>
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" src="{{tweet.user.profile_image_url}}" alt="{{tweet.user.name}}">
+      </a>
+      <div class="media-body">
+        {{#if tweet.user}}
+          <h5 class="media-heading">{{tweet.user.name}} <span class="text-muted">@{{tweet.user.screen_name}}</span></h5>
+        {{/if}}
+        {{tweet.text}}
+      </div>
+    </div>
+
+  </div>
+  <div class="panel-body">
+
+    <div class="media">
+      <a class="pull-left" href="#">
+        <img class="media-object" src="{{user.profile_image_url}}" alt="{{user.name}}">
+      </a>
+      <div class="media-body">
+        <h4 class="media-heading">{{user.name}}</h4>
+        @{{user.screen_name}} <a href="/logout">[sign out]</a>
+      </div>
+    </div>
+
+    <form method="POST" action="/tweet">
+
+      <input type="hidden" name="in_reply_to_status_id" value="{{in_reply_to_status_id}}" />
+      <input type="hidden" name="imgurl" value="{{imgurl}}" />
+
+      <textarea name="status" id="status" class="form-control" rows="3">{{status}}</textarea>
+
+      <div class="pull-right" style="margin-bottom:15px;">
+        <span id="counter" class="text-muted">0</span>
+        <input type="submit" class="btn btn-default" id="submit" value="Tweet" />
+      </div>
+
+      <img id="tweetimg" class="img-responsive" src="{{imgurl}}" />
+
+    </form>
+
+  </div>
+</div>
 
 <script>
 
   var $counter = document.querySelector("#counter");
-  var $text = document.querySelector("#text");
+  var $status = document.querySelector("#status");
   var $form = document.querySelector("form");
+  var $submit = document.querySelector("#submit");
 
   var imgurl = "{{imgurl}}";
 
   var updateCounter = function() {
     var base = (imgurl.length>0) ? 119 : 140;
-    $counter.textContent = base - $text.value.length;
+    var value = $status.value.replace(/https?:\/\/[^ ]+/ig,'http://t.co/0P0DcYvWFY');
+    var counter = base - value.length;
+    $counter.textContent = counter;
+    $submit.disabled = (counter < 0);
   };
 
-  $text.addEventListener("keyup", updateCounter);
+  $status.addEventListener("keyup", updateCounter);
   updateCounter();
+  setTimeout(function() {
+    $status.focus();
+  }, 500);
 
   $form.addEventListener("submit", function() {
     console.log("Form submitted!");

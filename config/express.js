@@ -24,8 +24,6 @@ module.exports = function(server) {
     server.use(session({ secret: '12312312807872', store: new MongoStore({url:config.mongodb}) }));
     server.use(passport.initialize());
     server.use(passport.session());
-    server.engine('.hbs', exphbs({defaultLayout: 'main', extname: '.hbs'}));
-    server.set('view engine', '.hbs');
 
     passport.serializeUser(function(user, done) {
       console.log("Serializing user ", user);
@@ -38,4 +36,7 @@ module.exports = function(server) {
         done(err, user);
       });
     });
+
+    server.engine('.hbs', exphbs({defaultLayout: 'main', extname: '.hbs'}));
+    server.set('view engine', '.hbs');
 };

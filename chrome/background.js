@@ -1,4 +1,5 @@
-
+var base_url = 'http://localhost:3000';
+var base_url = 'http://savedyouaclick.herokuapp.com';
 
 chrome.runtime.onInstalled.addListener(function() {
 
@@ -29,15 +30,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendMessage) {
 function clickHandler(info, tab) {
 
   var shortcutUrl;
-  var hashtag = "#SavedYouAClick";
-  var text = tab.title;
+  var text = ""; 
 
   chrome.tabs.executeScript(null, {file: "content_script.js"});
 
-  // console.log("handling: ", info, tab);
-
   if(info.selectionText) { 
-    var text = info.selectionText + '\n' + tab.title;
+    var text = info.selectionText + " ";
   }
 
   // video element
@@ -57,18 +55,15 @@ function clickHandler(info, tab) {
 
   }
 
+  if(shortcutUrl)
+    text += shortcutUrl; 
+
+  var url = base_url + "?status="+encodeURIComponent(text)+"&title="+encodeURIComponent(tab.title)+"&url="+encodeURIComponent(tab.url);
+
   // image element
   if(info.srcUrl) {
-    shortcutUrl = info.srcUrl;
+    url += "&imgurl="+info.srcUrl;
   }
-
-  if(!shortcutUrl) 
-    shortcutUrl = tab.url;
-
-  text += " " + hashtag; 
-  text += " " + shortcutUrl; 
-
-  var url = 'https://twitter.com/intent/tweet?status=' + encodeURIComponent(text) 
 
   chrome.tabs.executeScript({code: 'setTimeout(function() { openTweet("'+url+'"); }, 10);'});
 

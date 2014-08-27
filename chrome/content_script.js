@@ -15,5 +15,9 @@ function openTweet(url) {
   if(handle) {
     url += "&via="+handle;
   }
-  window.open(url, "savedyouaclick-tweet", "width=520,height=400");
+
+  var height = 400;
+  if(url.match(/imgurl=/)) height = 675;
+
+  window.open(url, "savedyouaclick-tweet", "width=520,height="+height);
 }
