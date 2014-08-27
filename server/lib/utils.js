@@ -1,5 +1,4 @@
 var request = require('request')
-  , http = require('follow-redirects').http
   , urlLibrary = require('url');
 
 
