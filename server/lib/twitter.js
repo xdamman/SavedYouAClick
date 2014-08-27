@@ -3,8 +3,9 @@ var utils = require('./utils')
   , async = require('async')
   , request = require('request')
   , env = process.env.NODE_ENV || 'development'
-  , config = require('../config.'+env+'.json');
-
+  , config = require('../config/settings')(env)
+  ;
+  
 var twit = new twitter(config.twitter);
 
 module.exports = {

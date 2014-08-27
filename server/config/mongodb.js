@@ -1,6 +1,6 @@
 var mongoskin = require('mongoskin')
   , env = process.env.NODE_ENV || 'development'
-  , config = require('../config.'+env+'.json')
+  , config = require('../config/settings')(env)
   ;
 
 module.exports = function(server) {
