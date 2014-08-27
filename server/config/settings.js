@@ -8,7 +8,7 @@ module.exports = function(env) {
         base_url: process.env.BASE_URL
       , mongodb: process.env.MONGODB
       , twitter: {
-          consumer_keys: process.env.TWITTER_CONSUMER_KEY
+          consumer_key: process.env.TWITTER_CONSUMER_KEY
         , consumer_secret: process.env.TWITTER_CONSUMER_SECRET
       }
     };

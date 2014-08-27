@@ -5,6 +5,9 @@ var express = require('express')
   , session = require('express-session')
   , exphbs  = require('express-handlebars')
   , logger = require('express-logger')
+  , MongoStore = require('connect-mongo')(session)
+  , env = process.env.NODE_ENV || "development"
+  , config = require('./settings')(env)
   ;
 
 module.exports = function(server) {
@@ -18,7 +21,7 @@ module.exports = function(server) {
     server.use(bodyParser.urlencoded({ extended: false }))
 
     server.use(bodyParser.json());
-    server.use(session({ secret: '12312312807872' }));
+    server.use(session({ secret: '12312312807872', store: new MongoStore({url:config.mongodb}) }));
     server.use(passport.initialize());
     server.use(passport.session());
     server.engine('.hbs', exphbs({defaultLayout: 'main', extname: '.hbs'}));
